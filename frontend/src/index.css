@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+/* KPDF Theme Colors */
+:root {
+  --kpdf-primary: #1B4F72;
+  --kpdf-accent: #2E86C1;
+  --kpdf-light-bg: #f0f7fc;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

@@ -1,0 +1,29 @@
+# Claude
+CLAUDE.md
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node (frontend)
+node_modules/
+dist/
+.next/
+
+# Python (backend)
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+*.egg-info/
