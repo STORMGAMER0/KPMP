@@ -24,4 +24,20 @@ export const menteesApi = {
     });
     return response.data;
   },
+
+  uploadProfilePicture: async (file: File): Promise<MenteeProfile> => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await apiClient.post<MenteeProfile>(
+      '/mentees/me/profile-picture',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+    return response.data;
+  },
 };

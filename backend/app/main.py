@@ -1,23 +1,41 @@
+import logging
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.config import get_settings
 from app.core.exceptions import AppError
 from app.api.v1.router import api_router
+from app.services.scheduler_service import setup_scheduler, start_scheduler, stop_scheduler
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
 
 settings = get_settings()
+
+# Ensure upload directories exist
+uploads_dir = Path(settings.upload_dir)
+profiles_dir = uploads_dir / "profiles"
+profiles_dir.mkdir(parents=True, exist_ok=True)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
-    # TODO: Initialize APScheduler here
+    setup_scheduler()
+    start_scheduler()
+    logging.info("Application started with scheduler")
     yield
     # Shutdown
-    # TODO: Shutdown APScheduler here
+    stop_scheduler()
+    logging.info("Application shutdown")
 
 
 app = FastAPI(
@@ -65,6 +83,9 @@ async def app_error_handler(request: Request, exc: AppError):
 
 # Include API router
 app.include_router(api_router, prefix="/api/v1")
+
+# Mount static files for uploaded content
+app.mount("/static", StaticFiles(directory=settings.upload_dir), name="static")
 
 
 @app.get("/health")

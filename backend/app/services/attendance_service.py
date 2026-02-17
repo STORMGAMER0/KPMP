@@ -143,13 +143,54 @@ class AttendanceService:
             expires_at=expires_at,
         )
 
-    async def get_session_attendance(self, session_id: int) -> list[Attendance]:
-        """Get all attendance records for a session."""
+    async def get_session_attendance(self, session_id: int) -> list[dict]:
+        """
+        Get attendance details for all mentees for a session.
+        Returns a list of dicts with attendance info for every mentee,
+        including those who haven't joined (ABSENT).
+        """
         session = await self.session_repo.find_by_id(session_id)
         if session is None:
             raise NotFoundError("Session", session_id)
 
-        return await self.repo.find_by_session_with_mentees(session_id)
+        # Get existing attendance records
+        attendances = await self.repo.find_by_session_with_mentees(session_id)
+        attendance_by_mentee = {a.mentee_id: a for a in attendances}
+
+        # Get all mentees
+        all_mentees = await self.mentee_repo.find_all()
+
+        result = []
+        for mentee in all_mentees:
+            attendance = attendance_by_mentee.get(mentee.id)
+            if attendance:
+                result.append({
+                    "attendance_id": attendance.id,
+                    "mentee_profile_id": mentee.id,
+                    "mentee_id": mentee.mentee_id,
+                    "full_name": mentee.full_name,
+                    "track": mentee.track,
+                    "status": attendance.status,
+                    "joined_at": attendance.joined_at,
+                    "code_entered_at": attendance.code_entered_at,
+                })
+            else:
+                result.append({
+                    "attendance_id": None,
+                    "mentee_profile_id": mentee.id,
+                    "mentee_id": mentee.mentee_id,
+                    "full_name": mentee.full_name,
+                    "track": mentee.track,
+                    "status": AttendanceStatus.ABSENT,
+                    "joined_at": None,
+                    "code_entered_at": None,
+                })
+
+        # Sort by status (PRESENT first, then PARTIAL, then ABSENT)
+        status_order = {AttendanceStatus.PRESENT: 0, AttendanceStatus.PARTIAL: 1, AttendanceStatus.ABSENT: 2}
+        result.sort(key=lambda x: (status_order.get(x["status"], 3), x["full_name"]))
+
+        return result
 
     async def override_attendance(
         self, attendance_id: int, status: AttendanceStatus
@@ -160,3 +201,32 @@ class AttendanceService:
             raise NotFoundError("Attendance", attendance_id)
 
         return await self.repo.update_status(attendance.id, status=status)
+
+    async def create_attendance(
+        self, session_id: int, mentee_id: int, status: AttendanceStatus
+    ) -> Attendance:
+        """Create attendance record for a mentee (coordinator action)."""
+        # Verify session exists
+        session = await self.session_repo.find_by_id(session_id)
+        if session is None:
+            raise NotFoundError("Session", session_id)
+
+        # Verify mentee exists
+        mentee = await self.mentee_repo.find_by_id(mentee_id)
+        if mentee is None:
+            raise NotFoundError("MenteeProfile", mentee_id)
+
+        # Check if already exists
+        existing = await self.repo.find_by_user_and_session(mentee_id, session_id)
+        if existing:
+            # Update existing record instead
+            return await self.repo.update_status(existing.id, status=status)
+
+        now = datetime.now(timezone.utc)
+        return await self.repo.create(
+            session_id=session_id,
+            mentee_id=mentee_id,
+            status=status,
+            joined_at=now if status != AttendanceStatus.ABSENT else None,
+            code_entered_at=now if status == AttendanceStatus.PRESENT else None,
+        )

@@ -16,7 +16,9 @@ import LiveSessionPage from '@/pages/mentee/LiveSessionPage';
 import ProfilePage from '@/pages/mentee/ProfilePage';
 import AdminDashboardPage from '@/pages/admin/AdminDashboardPage';
 import SessionsPage from '@/pages/admin/SessionsPage';
+import SessionAttendancePage from '@/pages/admin/SessionAttendancePage';
 import MenteesPage from '@/pages/admin/MenteesPage';
+import MenteeDetailPage from '@/pages/admin/MenteeDetailPage';
 import LeaderboardPage from '@/pages/admin/LeaderboardPage';
 import TelegramPage from '@/pages/admin/TelegramPage';
 
@@ -85,7 +87,9 @@ function App() {
           >
             <Route index element={<AdminDashboardPage />} />
             <Route path="sessions" element={<SessionsPage />} />
+            <Route path="sessions/:sessionId/attendance" element={<SessionAttendancePage />} />
             <Route path="mentees" element={<MenteesPage />} />
+            <Route path="mentees/:menteeId" element={<MenteeDetailPage />} />
             <Route path="leaderboard" element={<LeaderboardPage />} />
             <Route path="telegram" element={<TelegramPage />} />
           </Route>

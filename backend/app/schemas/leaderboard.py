@@ -5,6 +5,7 @@ from app.services.scoring_service import LeaderboardEntry
 
 class LeaderboardEntryResponse(BaseModel):
     rank: int
+    mentee_profile_id: int
     mentee_id: str
     full_name: str
     track: str
@@ -19,6 +20,7 @@ class LeaderboardEntryResponse(BaseModel):
     def from_entry(cls, entry: LeaderboardEntry) -> "LeaderboardEntryResponse":
         return cls(
             rank=entry.rank,
+            mentee_profile_id=entry.mentee_id,
             mentee_id=entry.mentee_program_id,
             full_name=entry.full_name,
             track=entry.track,

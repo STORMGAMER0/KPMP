@@ -55,6 +55,8 @@ class AttendanceOverrideRequest(BaseModel):
 
 
 class MenteeAttendanceDetailResponse(BaseModel):
+    attendance_id: int | None
+    mentee_profile_id: int
     mentee_id: str
     full_name: str
     track: str
@@ -65,6 +67,8 @@ class MenteeAttendanceDetailResponse(BaseModel):
     @classmethod
     def from_model(cls, attendance: Attendance) -> "MenteeAttendanceDetailResponse":
         return cls(
+            attendance_id=attendance.id,
+            mentee_profile_id=attendance.mentee.id,
             mentee_id=attendance.mentee.mentee_id,
             full_name=attendance.mentee.full_name,
             track=attendance.mentee.track,

@@ -113,7 +113,7 @@ async def get_session_attendance(
     current_user: Annotated[User, Depends(get_current_coordinator)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
-    """Get attendance details for a session (coordinator only)."""
+    """Get attendance details for all mentees for a session (coordinator only)."""
     service = AttendanceService(db)
     try:
         attendances = await service.get_session_attendance(session_id)
@@ -122,7 +122,8 @@ async def get_session_attendance(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=e.message,
         )
-    return [MenteeAttendanceDetailResponse.from_model(a) for a in attendances]
+    # attendances is already a list of dicts matching MenteeAttendanceDetailResponse
+    return attendances
 
 
 @router.patch("/{attendance_id}", response_model=AttendanceResponse)
@@ -136,6 +137,26 @@ async def override_attendance(
     service = AttendanceService(db)
     try:
         attendance = await service.override_attendance(attendance_id, request.status)
+    except NotFoundError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=e.message,
+        )
+    return AttendanceResponse.from_model(attendance)
+
+
+@router.post("/sessions/{session_id}/mentee/{mentee_id}", response_model=AttendanceResponse)
+async def create_attendance(
+    session_id: int,
+    mentee_id: int,
+    request: AttendanceOverrideRequest,
+    current_user: Annotated[User, Depends(get_current_coordinator)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+):
+    """Create attendance record for a mentee (coordinator only)."""
+    service = AttendanceService(db)
+    try:
+        attendance = await service.create_attendance(session_id, mentee_id, request.status)
     except NotFoundError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

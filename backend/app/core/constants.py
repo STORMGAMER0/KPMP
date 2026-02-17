@@ -7,7 +7,8 @@ class UserRole(str, Enum):
 
 
 class AttendanceStatus(str, Enum):
-    NOT_JOINED = "NOT_JOINED"
+    NOT_JOINED = "NOT_JOINED"  # Legacy - kept for DB compatibility
+    ABSENT = "ABSENT"
     PARTIAL = "PARTIAL"
     PRESENT = "PRESENT"
 
