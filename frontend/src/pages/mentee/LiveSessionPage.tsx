@@ -55,17 +55,15 @@ export default function LiveSessionPage() {
     setError('');
 
     try {
-      const result = await attendanceApi.joinSession(session.id);
-      setAttendanceStatus(result.attendance.status);
+      const attendance = await attendanceApi.joinSession(session.id);
+      setAttendanceStatus(attendance.status);
 
       // Open Google Meet in new tab
-      if (result.google_meet_link) {
-        window.open(result.google_meet_link, '_blank');
-      } else if (session.google_meet_link) {
+      if (session.google_meet_link) {
         window.open(session.google_meet_link, '_blank');
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || err.response?.data?.detail || 'Failed to join session');
+      setError(err.response?.data?.detail || 'Failed to join session');
     } finally {
       setIsJoining(false);
     }
@@ -80,12 +78,14 @@ export default function LiveSessionPage() {
     setSuccessMessage('');
 
     try {
-      const result = await attendanceApi.submitCode(session.id, attendanceCode.trim());
-      setAttendanceStatus(result.attendance.status);
-      setSuccessMessage(result.message);
+      const attendance = await attendanceApi.submitCode(session.id, attendanceCode.trim());
+      setAttendanceStatus(attendance.status);
+      if (attendance.status === 'PRESENT') {
+        setSuccessMessage('Attendance confirmed!');
+      }
       refetch(); // Refresh session data
     } catch (err: any) {
-      setError(err.response?.data?.message || err.response?.data?.detail || 'Invalid attendance code');
+      setError(err.response?.data?.detail || 'Invalid attendance code');
     } finally {
       setIsSubmitting(false);
     }

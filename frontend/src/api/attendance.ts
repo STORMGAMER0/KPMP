@@ -1,38 +1,29 @@
 import apiClient from './client';
-import type { Attendance } from '@/types';
 
-export interface JoinSessionResponse {
-  attendance: Attendance;
-  google_meet_link: string | null;
-}
-
-export interface SubmitCodeResponse {
-  attendance: Attendance;
-  message: string;
+// Matches backend AttendanceResponse
+export interface AttendanceResponse {
+  id: number;
+  session_id: number;
+  mentee_id: number;
+  status: 'NOT_JOINED' | 'PARTIAL' | 'PRESENT';
+  joined_at: string | null;
+  code_entered_at: string | null;
+  created_at: string;
 }
 
 export const attendanceApi = {
-  joinSession: async (sessionId: number): Promise<JoinSessionResponse> => {
-    const response = await apiClient.post<JoinSessionResponse>('/attendance/join', {
+  joinSession: async (sessionId: number): Promise<AttendanceResponse> => {
+    const response = await apiClient.post<AttendanceResponse>('/attendance/join', {
       session_id: sessionId,
     });
     return response.data;
   },
 
-  submitCode: async (sessionId: number, code: string): Promise<SubmitCodeResponse> => {
-    const response = await apiClient.post<SubmitCodeResponse>('/attendance/submit-code', {
+  submitCode: async (sessionId: number, code: string): Promise<AttendanceResponse> => {
+    const response = await apiClient.post<AttendanceResponse>('/attendance/code', {
       session_id: sessionId,
       code: code,
     });
     return response.data;
-  },
-
-  getMyAttendance: async (sessionId: number): Promise<Attendance | null> => {
-    try {
-      const response = await apiClient.get<Attendance>(`/attendance/session/${sessionId}/me`);
-      return response.data;
-    } catch {
-      return null;
-    }
   },
 };
