@@ -56,13 +56,15 @@ class AttendanceRepository(BaseRepository[Attendance]):
             )
             .outerjoin(
                 Session,
-                (Session.id == Attendance.session_id) & (Session.is_core_session == True),
+                (Session.id == Attendance.session_id)
+                & (Session.is_core_session == True)
+                & (Session.program_id == program_id),
             )
             .group_by(MenteeProfile.id)
         )
 
         if track:
-            query = query.where(MenteeProfile.track == track)
+            query = query.where(MenteeProfile.track.ilike(track))
 
         result = await self.db.execute(query)
         rows = result.all()

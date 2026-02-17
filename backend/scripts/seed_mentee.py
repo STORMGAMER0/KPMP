@@ -41,7 +41,7 @@ async def seed():
                 user_id=user.id,
                 mentee_id=mentee_id,
                 full_name="Test Mentee",
-                track="Backend Engineering",
+                track="ENGINEERING",
             )
             db.add(profile)
 
@@ -49,7 +49,7 @@ async def seed():
             print(f"  Mentee ID: {mentee_id}")
             print(f"  Email: {email}")
             print(f"  Password: test123")
-            print(f"  Track: Backend Engineering")
+            print(f"  Track: ENGINEERING")
 
         await db.commit()
         print("Done!")

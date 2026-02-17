@@ -38,6 +38,14 @@ class MenteeRepository(BaseRepository[MenteeProfile]):
         )
         return result.scalar_one_or_none()
 
+    async def find_by_id_with_user(self, profile_id: int) -> MenteeProfile | None:
+        result = await self.db.execute(
+            select(MenteeProfile)
+            .options(selectinload(MenteeProfile.user))
+            .where(MenteeProfile.id == profile_id)
+        )
+        return result.scalar_one_or_none()
+
     async def find_by_telegram_id(self, telegram_user_id: int) -> MenteeProfile | None:
         result = await self.db.execute(
             select(MenteeProfile).where(

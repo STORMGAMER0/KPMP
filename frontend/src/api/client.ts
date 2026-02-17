@@ -25,7 +25,10 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    // Don't redirect on 401 for auth endpoints (login should show error, not redirect)
+    const isAuthEndpoint = error.config?.url?.startsWith('/auth/');
+
+    if (error.response?.status === 401 && !isAuthEndpoint) {
       // Clear tokens and redirect to login
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');

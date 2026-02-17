@@ -36,8 +36,8 @@ class MenteeService:
         return await self.repo.find_all_with_user(track=track, search=search)
 
     async def get_by_id(self, mentee_id: int) -> MenteeProfile:
-        """Get mentee by ID."""
-        profile = await self.repo.find_by_id(mentee_id)
+        """Get mentee by profile ID."""
+        profile = await self.repo.find_by_id_with_user(mentee_id)
         if profile is None:
             raise NotFoundError("MenteeProfile", mentee_id)
         return profile
@@ -50,7 +50,7 @@ class MenteeService:
         profile_pic_url: str | None = None,
     ) -> MenteeProfile:
         """Update mentee profile (coordinator action)."""
-        profile = await self.repo.find_by_user_id_with_user(mentee_id)
+        profile = await self.repo.find_by_id_with_user(mentee_id)
         if profile is None:
             raise NotFoundError("MenteeProfile", mentee_id)
 
