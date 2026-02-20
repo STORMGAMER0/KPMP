@@ -19,8 +19,11 @@ from app.schemas.auth import (
     RefreshRequest,
     PasswordChangeRequest,
     PasswordResetRequest,
+    ForgotPasswordRequest,
+    ResetPasswordWithTokenRequest,
     UserInfoResponse,
 )
+from app.core.exceptions import InvalidResetTokenError
 
 router = APIRouter()
 
@@ -127,3 +130,33 @@ async def get_current_user_info(
         role=current_user.role,
         must_reset_password=current_user.must_reset_password,
     )
+
+
+@router.post("/forgot-password")
+async def forgot_password(
+    request: ForgotPasswordRequest,
+    db: Annotated[AsyncSession, Depends(get_db)],
+):
+    """Request password reset. Sends email with reset link if user exists."""
+    service = AuthService(db)
+    await service.request_password_reset(request.identifier)
+    # Always return success to prevent email enumeration
+    return {"message": "If an account exists with that identifier, you will receive a password reset email."}
+
+
+@router.post("/reset-password-with-token")
+async def reset_password_with_token(
+    request: ResetPasswordWithTokenRequest,
+    db: Annotated[AsyncSession, Depends(get_db)],
+):
+    """Reset password using token from email."""
+    service = AuthService(db)
+    try:
+        await service.reset_password_with_token(request.token, request.new_password)
+    except InvalidResetTokenError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=e.message,
+        )
+
+    return {"message": "Password reset successfully. You can now login with your new password."}

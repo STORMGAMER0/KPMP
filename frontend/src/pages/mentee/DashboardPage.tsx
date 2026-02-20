@@ -209,17 +209,17 @@ export default function DashboardPage() {
               </div>
 
               {/* Countdown Timer */}
-              <div className="mb-6 p-6 rounded-lg bg-[#f0f7fc]">
+              <div className="mb-6 p-4 sm:p-6 rounded-lg bg-[#f0f7fc]">
                 <p className="text-sm text-gray-600 mb-3 text-center">Session starts in</p>
-                <div className="grid grid-cols-4 gap-4">
+                <div className="grid grid-cols-4 gap-2 sm:gap-4">
                   {[
                     { value: timeLeft.days, label: 'Days' },
-                    { value: timeLeft.hours, label: 'Hours' },
-                    { value: timeLeft.minutes, label: 'Minutes' },
-                    { value: timeLeft.seconds, label: 'Seconds' },
+                    { value: timeLeft.hours, label: 'Hrs' },
+                    { value: timeLeft.minutes, label: 'Min' },
+                    { value: timeLeft.seconds, label: 'Sec' },
                   ].map((item) => (
                     <div key={item.label} className="text-center">
-                      <div className="text-3xl mb-1 text-[#1B4F72]">{item.value}</div>
+                      <div className="text-2xl sm:text-3xl mb-1 text-[#1B4F72]">{item.value}</div>
                       <div className="text-xs text-gray-600">{item.label}</div>
                     </div>
                   ))}

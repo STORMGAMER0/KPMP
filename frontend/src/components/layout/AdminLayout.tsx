@@ -5,6 +5,7 @@ import {
   Calendar,
   Trophy,
   MessageSquare,
+  Mail,
   LogOut,
   Menu,
 } from 'lucide-react';
@@ -17,6 +18,7 @@ const sidebarItems = [
   { id: 'mentees', label: 'Mentees', icon: Users, path: '/admin/mentees' },
   { id: 'leaderboard', label: 'Leaderboard', icon: Trophy, path: '/admin/leaderboard' },
   { id: 'telegram', label: 'Telegram', icon: MessageSquare, path: '/admin/telegram' },
+  { id: 'email', label: 'Send Email', icon: Mail, path: '/admin/email' },
 ];
 
 export default function AdminLayout() {
@@ -31,6 +33,7 @@ export default function AdminLayout() {
     if (path.startsWith('/admin/mentees')) return 'mentees';
     if (path.startsWith('/admin/leaderboard')) return 'leaderboard';
     if (path.startsWith('/admin/telegram')) return 'telegram';
+    if (path.startsWith('/admin/email')) return 'email';
     return 'dashboard';
   };
 

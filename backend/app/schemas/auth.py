@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, EmailStr
 
 from app.core.constants import UserRole
 
@@ -26,6 +26,15 @@ class PasswordChangeRequest(BaseModel):
 
 
 class PasswordResetRequest(BaseModel):
+    new_password: str
+
+
+class ForgotPasswordRequest(BaseModel):
+    identifier: str  # email or mentee_id
+
+
+class ResetPasswordWithTokenRequest(BaseModel):
+    token: str
     new_password: str
 
 

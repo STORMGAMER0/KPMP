@@ -24,6 +24,14 @@ class UserRepository(BaseRepository[User]):
         )
         return result.scalar_one_or_none()
 
+    async def find_by_reset_token(self, token: str) -> User | None:
+        result = await self.db.execute(
+            select(User)
+            .options(selectinload(User.mentee_profile))
+            .where(User.reset_token == token)
+        )
+        return result.scalar_one_or_none()
+
     async def create_user(
         self,
         email: str,

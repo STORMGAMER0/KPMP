@@ -316,5 +316,70 @@ Kings Patriots Development Foundation
         return await self.send_email(to_email, subject, html_content, text_content)
 
 
+    async def send_password_reset(
+        self,
+        to_email: str,
+        user_name: str,
+        reset_link: str,
+    ) -> bool:
+        """Send password reset email."""
+        subject = "Reset Your Password - KPDF Mentorship"
+
+        html_content = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+                .header {{ background: linear-gradient(135deg, #1B4F72, #2E86C1); color: white; padding: 20px; border-radius: 8px 8px 0 0; }}
+                .content {{ background: #f9f9f9; padding: 20px; border: 1px solid #ddd; border-top: none; border-radius: 0 0 8px 8px; }}
+                .btn {{ display: inline-block; background: #1B4F72; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin-top: 15px; }}
+                .warning {{ background: #fff3cd; border: 1px solid #ffc107; padding: 12px; border-radius: 6px; margin: 15px 0; font-size: 14px; }}
+                .footer {{ text-align: center; margin-top: 20px; color: #666; font-size: 12px; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1 style="margin: 0;">Password Reset</h1>
+                </div>
+                <div class="content">
+                    <p>Hi {user_name},</p>
+                    <p>We received a request to reset your password. Click the button below to create a new password:</p>
+
+                    <a href="{reset_link}" class="btn">Reset Password</a>
+
+                    <div class="warning">
+                        <strong>This link expires in 1 hour.</strong><br>
+                        If you didn't request this, you can safely ignore this email.
+                    </div>
+
+                    <p>If the button doesn't work, copy and paste this link into your browser:</p>
+                    <p style="word-break: break-all; font-size: 12px; color: #666;">{reset_link}</p>
+                </div>
+                <div class="footer">
+                    <p>Kings Patriots Development Foundation</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+
+        text_content = f"""
+Hi {user_name},
+
+We received a request to reset your password. Click the link below to create a new password:
+
+{reset_link}
+
+This link expires in 1 hour. If you didn't request this, you can safely ignore this email.
+
+Kings Patriots Development Foundation
+        """
+
+        return await self.send_email(to_email, subject, html_content, text_content)
+
+
 # Singleton instance
 email_service = EmailService()

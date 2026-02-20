@@ -11,6 +11,8 @@ import { MenteeLayout, AdminLayout } from '@/components/layout';
 // Pages
 import LoginPage from '@/pages/LoginPage';
 import ChangePasswordPage from '@/pages/ChangePasswordPage';
+import ForgotPasswordPage from '@/pages/ForgotPasswordPage';
+import ResetPasswordPage from '@/pages/ResetPasswordPage';
 import DashboardPage from '@/pages/mentee/DashboardPage';
 import LiveSessionPage from '@/pages/mentee/LiveSessionPage';
 import ProfilePage from '@/pages/mentee/ProfilePage';
@@ -21,6 +23,7 @@ import MenteesPage from '@/pages/admin/MenteesPage';
 import MenteeDetailPage from '@/pages/admin/MenteeDetailPage';
 import LeaderboardPage from '@/pages/admin/LeaderboardPage';
 import TelegramPage from '@/pages/admin/TelegramPage';
+import EmailPage from '@/pages/admin/EmailPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -59,6 +62,8 @@ function App() {
 
           {/* Public routes */}
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
 
           {/* Password change (protected but outside layouts) */}
           <Route path="/change-password" element={<ChangePasswordPage />} />
@@ -92,6 +97,7 @@ function App() {
             <Route path="mentees/:menteeId" element={<MenteeDetailPage />} />
             <Route path="leaderboard" element={<LeaderboardPage />} />
             <Route path="telegram" element={<TelegramPage />} />
+            <Route path="email" element={<EmailPage />} />
           </Route>
 
           {/* Catch all */}

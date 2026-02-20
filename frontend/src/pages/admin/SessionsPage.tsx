@@ -278,22 +278,74 @@ export default function SessionsPage() {
   return (
     <div>
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <h1 className="text-2xl text-[#1B4F72]">Sessions</h1>
         <button
           onClick={() => {
             setFormData(initialFormData);
             setShowCreateModal(true);
           }}
-          className="flex items-center gap-2 bg-[#1B4F72] text-white px-4 py-2 rounded-lg hover:opacity-90 transition-opacity"
+          className="flex items-center gap-2 bg-[#1B4F72] text-white px-4 py-2 rounded-lg hover:opacity-90 transition-opacity w-full sm:w-auto justify-center"
         >
           <Plus className="w-5 h-5" />
           Add Session
         </button>
       </div>
 
-      {/* Sessions Table */}
-      <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
+      {/* Sessions - Mobile Cards */}
+      <div className="lg:hidden space-y-4">
+        {sortedSessions.length === 0 ? (
+          <div className="bg-white rounded-lg shadow-md border border-gray-200 p-8 text-center text-gray-500">
+            No sessions found. Create your first session to get started.
+          </div>
+        ) : (
+          sortedSessions.map((session) => (
+            <div key={session.id} className="bg-white rounded-lg shadow-md border border-gray-200 p-4">
+              <div className="flex justify-between items-start mb-3">
+                <div>
+                  <h3 className="font-medium text-gray-900">{session.title}</h3>
+                  <span
+                    className={`inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-medium ${
+                      session.is_core_session
+                        ? 'bg-blue-100 text-blue-800'
+                        : 'bg-gray-100 text-gray-800'
+                    }`}
+                  >
+                    {session.is_core_session ? 'Core' : 'Optional'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => navigate(`/admin/sessions/${session.id}/attendance`)}
+                    className="p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg"
+                  >
+                    <Users className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => openEditModal(session)}
+                    className="p-2 text-gray-600 hover:text-[#2E86C1] hover:bg-gray-100 rounded-lg"
+                  >
+                    <Edit className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-3 text-sm text-gray-600">
+                <div className="flex items-center gap-1">
+                  <Calendar className="w-4 h-4 text-[#2E86C1]" />
+                  {formatDate(session.date)}
+                </div>
+                <div className="flex items-center gap-1">
+                  <Clock className="w-4 h-4 text-[#2E86C1]" />
+                  {formatTime(session.start_time)}
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Sessions Table - Desktop */}
+      <div className="hidden lg:block bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
         <table className="w-full">
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>

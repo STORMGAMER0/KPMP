@@ -89,3 +89,8 @@ class PermissionDeniedError(AppError):
 class CSVImportError(AppError):
     def __init__(self, detail: str):
         super().__init__(detail, "CSV_IMPORT_ERROR")
+
+
+class InvalidResetTokenError(AppError):
+    def __init__(self):
+        super().__init__("Invalid or expired reset token", "INVALID_RESET_TOKEN")

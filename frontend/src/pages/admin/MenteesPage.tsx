@@ -110,11 +110,11 @@ export default function MenteesPage() {
   return (
     <div>
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <h1 className="text-2xl text-[#1B4F72]">Mentees</h1>
         <button
           onClick={() => setShowUploadModal(true)}
-          className="flex items-center gap-2 bg-[#1B4F72] text-white px-4 py-2 rounded-lg hover:opacity-90 transition-opacity"
+          className="flex items-center gap-2 bg-[#1B4F72] text-white px-4 py-2 rounded-lg hover:opacity-90 transition-opacity w-full sm:w-auto justify-center"
         >
           <Upload className="w-5 h-5" />
           Import CSV
@@ -169,49 +169,44 @@ export default function MenteesPage() {
             <Link
               key={mentee.id}
               to={`/admin/mentees/${mentee.id}`}
-              className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+              className="block p-4 hover:bg-gray-50 transition-colors"
             >
-              <div className="flex items-center gap-4">
+              <div className="flex items-start gap-3 sm:gap-4">
                 {/* Avatar */}
                 {mentee.profile_pic_url ? (
                   <img
                     src={mentee.profile_pic_url}
                     alt={mentee.full_name}
-                    className="w-12 h-12 rounded-full object-cover"
+                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover flex-shrink-0"
                   />
                 ) : (
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#2E86C1] to-[#1B4F72] flex items-center justify-center text-white font-medium">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-[#2E86C1] to-[#1B4F72] flex items-center justify-center text-white font-medium text-sm sm:text-base flex-shrink-0">
                     {getInitials(mentee.full_name)}
                   </div>
                 )}
 
                 {/* Info */}
-                <div>
-                  <div className="flex items-center gap-3">
-                    <span className="font-medium text-gray-900">{mentee.full_name}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+                    <span className="font-medium text-gray-900 truncate">{mentee.full_name}</span>
                     <span className="text-sm text-gray-500">{mentee.mentee_id}</span>
                   </div>
-                  <div className="flex items-center gap-4 mt-1">
-                    {mentee.email && (
-                      <div className="flex items-center gap-1 text-sm text-gray-500">
-                        <Mail className="w-4 h-4" />
-                        {mentee.email}
-                      </div>
+                  <div className="flex flex-wrap items-center gap-2 mt-1">
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getTrackColor(mentee.track)}`}>
+                      {mentee.track}
+                    </span>
+                    {mentee.telegram_user_id && (
+                      <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-xs">
+                        TG
+                      </span>
                     )}
                   </div>
+                  {mentee.email && (
+                    <p className="text-sm text-gray-500 mt-1 truncate hidden sm:block">{mentee.email}</p>
+                  )}
                 </div>
-              </div>
 
-              <div className="flex items-center gap-4">
-                <span className={`px-3 py-1 rounded-full text-xs font-medium ${getTrackColor(mentee.track)}`}>
-                  {mentee.track}
-                </span>
-                {mentee.telegram_user_id && (
-                  <span className="px-2 py-1 bg-blue-50 text-blue-600 rounded text-xs">
-                    Telegram linked
-                  </span>
-                )}
-                <ChevronRight className="w-5 h-5 text-gray-400" />
+                <ChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0 mt-1" />
               </div>
             </Link>
           ))}

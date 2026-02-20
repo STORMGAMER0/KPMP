@@ -51,4 +51,15 @@ export const authApi = {
       telegram_username: telegramUsername || undefined,
     });
   },
+
+  forgotPassword: async (identifier: string): Promise<void> => {
+    await apiClient.post('/auth/forgot-password', { identifier });
+  },
+
+  resetPasswordWithToken: async (token: string, newPassword: string): Promise<void> => {
+    await apiClient.post('/auth/reset-password-with-token', {
+      token,
+      new_password: newPassword,
+    });
+  },
 };
