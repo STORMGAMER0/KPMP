@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Calendar,
@@ -42,6 +42,19 @@ export default function LiveSessionPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+
+  // Fetch attendance status when session loads
+  useEffect(() => {
+    if (session?.id) {
+      attendanceApi.getMyStatus(session.id).then((status) => {
+        if (status) {
+          setAttendanceStatus(status.status);
+        }
+      }).catch(() => {
+        // Ignore errors - just means no attendance record yet
+      });
+    }
+  }, [session?.id]);
 
   const hasActiveCode = session?.has_active_code ?? false;
 

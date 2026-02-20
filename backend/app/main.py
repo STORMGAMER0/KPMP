@@ -11,6 +11,7 @@ from app.config import get_settings
 from app.core.exceptions import AppError
 from app.api.v1.router import api_router
 from app.services.scheduler_service import setup_scheduler, start_scheduler, stop_scheduler
+from app.services.telegram_bot_service import setup_telegram_webhook
 
 # Configure logging
 logging.basicConfig(
@@ -31,7 +32,12 @@ async def lifespan(app: FastAPI):
     # Startup
     setup_scheduler()
     start_scheduler()
-    logging.info("Application started with scheduler")
+    logging.info("Scheduler started")
+
+    # Setup Telegram webhook
+    await setup_telegram_webhook()
+
+    logging.info("Application started")
     yield
     # Shutdown
     stop_scheduler()

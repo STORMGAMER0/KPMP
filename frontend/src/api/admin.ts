@@ -15,6 +15,7 @@ import type {
   LeaderboardEntry,
   UnmappedTelegramUser,
   TelegramMapRequest,
+  DashboardStats,
 } from '@/types';
 
 // Session Management API
@@ -133,5 +134,13 @@ export const telegramApi = {
 
   removeMapping: async (menteeId: number): Promise<void> => {
     await apiClient.delete(`/telegram/mapping/${menteeId}`);
+  },
+};
+
+// Dashboard Stats API
+export const dashboardApi = {
+  getStats: async (): Promise<DashboardStats> => {
+    const response = await apiClient.get<DashboardStats>('/dashboard/stats');
+    return response.data;
   },
 };

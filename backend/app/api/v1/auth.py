@@ -79,11 +79,14 @@ async def change_password(
     current_user: Annotated[User, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
-    """Change password for authenticated user."""
+    """Change password for authenticated user. Accepts telegram username on first login."""
     service = AuthService(db)
     try:
         await service.change_password(
-            current_user, request.current_password, request.new_password
+            current_user,
+            request.current_password,
+            request.new_password,
+            request.telegram_username,
         )
     except InvalidCurrentPasswordError as e:
         raise HTTPException(

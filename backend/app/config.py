@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     # Telegram
     telegram_bot_token: str = ""
     telegram_webhook_secret: str = ""
+    webhook_base_url: str = ""  # e.g., https://your-domain.com or ngrok URL
 
     # Email
     smtp_host: str = "smtp.gmail.com"

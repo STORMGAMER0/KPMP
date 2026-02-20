@@ -138,6 +138,16 @@ export interface TelegramMapRequest {
   mentee_profile_id: number;
 }
 
+// Dashboard types
+export interface DashboardStats {
+  total_mentees: number;
+  telegram_linked: number;
+  telegram_messages: number;
+  core_sessions: number;
+  attendance_rate: number;
+  present_count: number;
+}
+
 // API Response types
 export interface ApiError {
   error: string;

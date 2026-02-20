@@ -54,6 +54,19 @@ class MenteeRepository(BaseRepository[MenteeProfile]):
         )
         return result.scalar_one_or_none()
 
+    async def find_by_telegram_username(self, username: str) -> MenteeProfile | None:
+        """Find mentee by telegram username (case-insensitive, excludes pending_ placeholders)."""
+        clean_username = username.lower()
+        # Don't match placeholder usernames
+        if clean_username.startswith('pending_'):
+            return None
+        result = await self.db.execute(
+            select(MenteeProfile).where(
+                MenteeProfile.telegram_username == clean_username
+            )
+        )
+        return result.scalar_one_or_none()
+
     async def find_all_with_user(
         self, track: str | None = None, search: str | None = None
     ) -> list[MenteeProfile]:

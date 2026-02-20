@@ -22,6 +22,7 @@ class RefreshRequest(BaseModel):
 class PasswordChangeRequest(BaseModel):
     current_password: str
     new_password: str
+    telegram_username: str | None = None  # Required for mentee first login
 
 
 class PasswordResetRequest(BaseModel):

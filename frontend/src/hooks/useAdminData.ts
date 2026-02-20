@@ -5,6 +5,7 @@ import {
   attendanceAdminApi,
   leaderboardApi,
   telegramApi,
+  dashboardApi,
 } from '@/api/admin';
 import type {
   SessionCreateRequest,
@@ -201,5 +202,13 @@ export function useRemoveTelegramMapping() {
       queryClient.invalidateQueries({ queryKey: ['telegram', 'unmapped'] });
       queryClient.invalidateQueries({ queryKey: ['mentees'] });
     },
+  });
+}
+
+// Dashboard Stats hooks
+export function useDashboardStats() {
+  return useQuery({
+    queryKey: ['dashboard', 'stats'],
+    queryFn: () => dashboardApi.getStats(),
   });
 }

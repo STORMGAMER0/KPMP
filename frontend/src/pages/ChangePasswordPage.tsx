@@ -8,11 +8,15 @@ export default function ChangePasswordPage() {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [telegramUsername, setTelegramUsername] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
   const { user, updateUser } = useAuthStore();
+
+  const isFirstLogin = user?.must_reset_password;
+  const isMentee = user?.role === 'MENTEE';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,10 +32,20 @@ export default function ChangePasswordPage() {
       return;
     }
 
+    // Require telegram username for mentee first login
+    if (isFirstLogin && isMentee && !telegramUsername.trim()) {
+      setError('Please enter your Telegram username');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      await authApi.changePassword(oldPassword, newPassword);
+      await authApi.changePassword(
+        oldPassword,
+        newPassword,
+        isFirstLogin && isMentee ? telegramUsername.trim() : undefined
+      );
 
       // Update user state to reflect password changed
       updateUser({ must_reset_password: false });
@@ -69,9 +83,13 @@ export default function ChangePasswordPage() {
               />
             </svg>
           </div>
-          <h2 className="text-2xl text-[#1B4F72]">Change Password</h2>
+          <h2 className="text-2xl text-[#1B4F72]">
+            {isFirstLogin && isMentee ? 'Account Setup' : 'Change Password'}
+          </h2>
           <p className="text-sm text-gray-600 mt-2">
-            {user?.must_reset_password
+            {isFirstLogin && isMentee
+              ? 'Welcome! Set your password and Telegram username to get started.'
+              : isFirstLogin
               ? 'This is your first login. Please change your password to continue.'
               : 'Enter your current password and choose a new one.'}
           </p>
@@ -123,6 +141,31 @@ export default function ChangePasswordPage() {
             />
           </div>
 
+          {/* Telegram username field - only for mentee first login */}
+          {isFirstLogin && isMentee && (
+            <div className="border-t border-gray-200 pt-4 mt-4">
+              <label htmlFor="telegramUsername" className="block mb-2 text-gray-700 text-sm">
+                Telegram Username
+              </label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">@</span>
+                <input
+                  id="telegramUsername"
+                  type="text"
+                  placeholder="your_username"
+                  value={telegramUsername}
+                  onChange={(e) => setTelegramUsername(e.target.value.replace('@', ''))}
+                  className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2E86C1] focus:border-transparent"
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Enter your Telegram username for group participation tracking.
+              </p>
+            </div>
+          )}
+
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
               {error}
@@ -137,10 +180,10 @@ export default function ChangePasswordPage() {
             {isLoading ? (
               <>
                 <Spinner size="sm" />
-                Changing Password...
+                {isFirstLogin && isMentee ? 'Setting up...' : 'Changing Password...'}
               </>
             ) : (
-              'Change Password'
+              isFirstLogin && isMentee ? 'Complete Setup' : 'Change Password'
             )}
           </button>
         </form>

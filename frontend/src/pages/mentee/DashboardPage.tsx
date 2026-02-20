@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, Clock, Linkedin, User } from 'lucide-react';
+import { Calendar, Clock, Linkedin, User, CheckCircle, AlertCircle, Key, ExternalLink } from 'lucide-react';
 import { useNextSession } from '@/hooks/useNextSession';
 import { useMenteeProfile } from '@/hooks/useMenteeProfile';
 import { FullPageSpinner } from '@/components/ui/Spinner';
+import Spinner from '@/components/ui/Spinner';
+import { attendanceApi } from '@/api/attendance';
+import type { AttendanceStatus } from '@/types';
 
 function formatDate(dateStr: string): string {
   const date = new Date(dateStr);
@@ -24,7 +27,7 @@ function formatTime(timeStr: string): string {
 }
 
 export default function DashboardPage() {
-  const { data: session, isLoading: sessionLoading } = useNextSession();
+  const { data: session, isLoading: sessionLoading, refetch: refetchSession } = useNextSession();
   const { data: profile, isLoading: profileLoading, error: profileError } = useMenteeProfile();
 
   const [timeLeft, setTimeLeft] = useState({
@@ -33,6 +36,72 @@ export default function DashboardPage() {
     minutes: 0,
     seconds: 0,
   });
+
+  // Attendance state
+  const [attendanceCode, setAttendanceCode] = useState('');
+  const [attendanceStatus, setAttendanceStatus] = useState<AttendanceStatus | null>(null);
+  const [isJoining, setIsJoining] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+
+  // Fetch attendance status when session loads
+  useEffect(() => {
+    if (session?.id) {
+      attendanceApi.getMyStatus(session.id).then((status) => {
+        if (status) {
+          setAttendanceStatus(status.status);
+        }
+      }).catch(() => {
+        // Ignore errors - just means no attendance record yet
+      });
+    }
+  }, [session?.id]);
+
+  const handleJoinSession = async () => {
+    if (!session) return;
+
+    setIsJoining(true);
+    setError('');
+
+    try {
+      const attendance = await attendanceApi.joinSession(session.id);
+      setAttendanceStatus(attendance.status);
+
+      // Open Google Meet in new tab
+      if (session.google_meet_link) {
+        window.open(session.google_meet_link, '_blank');
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.detail || 'Failed to join session');
+    } finally {
+      setIsJoining(false);
+    }
+  };
+
+  const handleSubmitCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!session || !attendanceCode.trim()) return;
+
+    setIsSubmitting(true);
+    setError('');
+    setSuccessMessage('');
+
+    try {
+      const attendance = await attendanceApi.submitCode(session.id, attendanceCode.trim());
+      setAttendanceStatus(attendance.status);
+      if (attendance.status === 'PRESENT') {
+        setSuccessMessage('Attendance confirmed!');
+      }
+      refetchSession();
+    } catch (err: any) {
+      setError(err.response?.data?.detail || 'Invalid attendance code');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const hasActiveCode = session?.has_active_code ?? false;
 
   // Calculate countdown
   useEffect(() => {
@@ -189,6 +258,81 @@ export default function DashboardPage() {
                   </div>
                 </div>
               )}
+
+              {/* Attendance Section */}
+              <div className="border-t border-gray-200 pt-6 mb-6">
+                <h4 className="text-sm font-medium text-gray-700 mb-4 flex items-center gap-2">
+                  <Key className="w-4 h-4 text-[#2E86C1]" />
+                  Session Attendance
+                </h4>
+
+                {error && (
+                  <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700 text-sm">
+                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                    <span>{error}</span>
+                  </div>
+                )}
+
+                {attendanceStatus === 'PRESENT' || successMessage ? (
+                  <div className="p-4 bg-green-50 border-2 border-green-200 rounded-lg">
+                    <div className="flex items-center gap-3 text-green-700">
+                      <CheckCircle className="w-5 h-5" />
+                      <div>
+                        <p className="font-medium">Attendance confirmed!</p>
+                        <p className="text-sm">Status: PRESENT</p>
+                      </div>
+                    </div>
+                  </div>
+                ) : attendanceStatus === 'PARTIAL' ? (
+                  <div className="space-y-3">
+                    <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-700 text-sm">
+                      You've joined the session. Submit the code to mark your presence.
+                    </div>
+                    {hasActiveCode ? (
+                      <form onSubmit={handleSubmitCode} className="flex gap-2">
+                        <input
+                          type="text"
+                          placeholder="e.g., KPDF-A7X2"
+                          value={attendanceCode}
+                          onChange={(e) => setAttendanceCode(e.target.value.toUpperCase())}
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2E86C1] focus:border-transparent text-sm"
+                          required
+                          disabled={isSubmitting}
+                        />
+                        <button
+                          type="submit"
+                          disabled={isSubmitting}
+                          className="text-white px-4 py-2 rounded-lg hover:opacity-90 transition-opacity bg-[#1B4F72] disabled:opacity-50 flex items-center gap-2 text-sm"
+                        >
+                          {isSubmitting ? <Spinner size="sm" /> : 'Submit'}
+                        </button>
+                      </form>
+                    ) : (
+                      <p className="text-gray-500 text-sm">
+                        Waiting for attendance code from coordinator...
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <button
+                    onClick={handleJoinSession}
+                    disabled={isJoining}
+                    className="w-full text-white py-3 rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2 bg-[#2E86C1] disabled:opacity-50"
+                  >
+                    {isJoining ? (
+                      <>
+                        <Spinner size="sm" />
+                        Joining...
+                      </>
+                    ) : (
+                      <>
+                        <ExternalLink className="w-4 h-4" />
+                        Join Session
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
 
               {/* View Details Button */}
               <Link

@@ -40,6 +40,20 @@ class AttendanceService:
         self.mentee_repo = MenteeRepository(db)
         self.db = db
 
+    async def get_mentee_attendance(
+        self, user_id: int, session_id: int
+    ) -> Attendance | None:
+        """Get the mentee's attendance record for a specific session."""
+        mentee = await self.mentee_repo.find_by_user_id(user_id)
+        if mentee is None:
+            raise NotFoundError("MenteeProfile", user_id)
+
+        session = await self.session_repo.find_by_id(session_id)
+        if session is None:
+            raise NotFoundError("Session", session_id)
+
+        return await self.repo.find_by_user_and_session(mentee.id, session_id)
+
     async def record_join(self, user_id: int, session_id: int) -> Attendance:
         """
         Record mentee joining a session.

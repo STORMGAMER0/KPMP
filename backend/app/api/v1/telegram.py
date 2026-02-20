@@ -1,9 +1,10 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi import APIRouter, Depends, HTTPException, status, Request, Header
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_db, get_current_coordinator
+from app.config import get_settings
 from app.core.exceptions import NotFoundError
 from app.models.user import User
 from app.services.telegram_service import TelegramService
@@ -19,11 +20,20 @@ router = APIRouter()
 async def telegram_webhook(
     request: Request,
     db: Annotated[AsyncSession, Depends(get_db)],
+    x_telegram_bot_api_secret_token: str | None = Header(None),
 ):
     """
     Handle Telegram webhook updates.
     Silently counts messages from group chats.
     """
+    settings = get_settings()
+
+    # Verify webhook secret if configured
+    if settings.telegram_webhook_secret:
+        if x_telegram_bot_api_secret_token != settings.telegram_webhook_secret:
+            # Silently reject - don't reveal webhook exists
+            return {"ok": True}
+
     try:
         update = await request.json()
     except Exception:

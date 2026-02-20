@@ -25,6 +25,26 @@ from app.schemas.attendance import (
 router = APIRouter()
 
 
+@router.get("/my-status/{session_id}", response_model=AttendanceResponse | None)
+async def get_my_attendance_status(
+    session_id: int,
+    current_user: Annotated[User, Depends(get_current_mentee)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+):
+    """Get the current mentee's attendance status for a session."""
+    service = AttendanceService(db)
+    try:
+        attendance = await service.get_mentee_attendance(current_user.id, session_id)
+    except NotFoundError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=e.message,
+        )
+    if attendance is None:
+        return None
+    return AttendanceResponse.from_model(attendance)
+
+
 @router.post("/join", response_model=AttendanceResponse)
 async def join_session(
     request: JoinSessionRequest,

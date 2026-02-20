@@ -82,13 +82,23 @@ class AuthService:
         return user, new_access_token, new_refresh_token
 
     async def change_password(
-        self, user: User, current_password: str, new_password: str
+        self, user: User, current_password: str, new_password: str,
+        telegram_username: str | None = None
     ) -> None:
-        """Change password for authenticated user."""
+        """Change password for authenticated user. Optionally set telegram username on first login."""
         if not verify_password(current_password, user.password_hash):
             raise InvalidCurrentPasswordError()
 
         user.password_hash = hash_password(new_password)
+
+        # Save telegram username if provided (for mentees on first login)
+        if telegram_username and user.must_reset_password:
+            mentee = await self.mentee_repo.find_by_user_id(user.id)
+            if mentee:
+                # Normalize username (remove @ if present, lowercase)
+                clean_username = telegram_username.lstrip('@').lower()
+                mentee.telegram_username = clean_username
+
         user.must_reset_password = False
         await self.db.flush()
 

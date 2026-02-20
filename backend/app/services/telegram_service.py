@@ -40,9 +40,18 @@ class TelegramService:
 
         tg_user_id = message["from"]["id"]
         chat_id = chat.get("id")
+        telegram_username = message["from"].get("username")
 
-        # Check if user is mapped to a mentee
+        # Check if user is already mapped to a mentee by telegram_user_id
         mentee = await self.mentee_repo.find_by_telegram_id(tg_user_id)
+
+        # If not mapped by ID, try to auto-match by username
+        if mentee is None and telegram_username:
+            mentee = await self.mentee_repo.find_by_telegram_username(telegram_username)
+            if mentee:
+                # Auto-link: save the permanent telegram_user_id to the mentee
+                mentee.telegram_user_id = tg_user_id
+                await self.db.flush()
 
         if mentee:
             # User is mapped - increment their message count
@@ -52,7 +61,6 @@ class TelegramService:
         else:
             # User is not mapped - track in unmapped users table
             telegram_name = self._extract_name(message["from"])
-            telegram_username = message["from"].get("username")
             await self.unmapped_repo.upsert(
                 telegram_user_id=tg_user_id,
                 telegram_name=telegram_name,

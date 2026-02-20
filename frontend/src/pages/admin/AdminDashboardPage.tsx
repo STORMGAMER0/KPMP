@@ -10,6 +10,8 @@ import {
   Copy,
   CheckCircle,
   RefreshCw,
+  BarChart3,
+  Send,
 } from 'lucide-react';
 import {
   useSessions,
@@ -17,6 +19,7 @@ import {
   useLeaderboard,
   useUnmappedTelegramUsers,
   useGenerateAttendanceCode,
+  useDashboardStats,
 } from '@/hooks/useAdminData';
 import { FullPageSpinner } from '@/components/ui/Spinner';
 import Spinner from '@/components/ui/Spinner';
@@ -43,6 +46,7 @@ export default function AdminDashboardPage() {
   const { data: mentees, isLoading: loadingMentees } = useMentees();
   const { data: leaderboard, isLoading: loadingLeaderboard } = useLeaderboard();
   const { data: unmappedUsers } = useUnmappedTelegramUsers();
+  const { data: dashboardStats, isLoading: loadingStats } = useDashboardStats();
 
   const generateCode = useGenerateAttendanceCode();
   const [generatedCode, setGeneratedCode] = useState<{ code: string; expires_at: string } | null>(null);
@@ -55,10 +59,13 @@ export default function AdminDashboardPage() {
     ?.filter((s) => new Date(s.date) >= new Date(now.toDateString()))
     ?.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
 
-  // Calculate stats
-  const totalMentees = mentees?.length || 0;
+  // Calculate stats from dashboard endpoint
+  const totalMentees = dashboardStats?.total_mentees || mentees?.length || 0;
   const totalSessions = sessions?.length || 0;
   const unmappedCount = unmappedUsers?.length || 0;
+  const attendanceRate = dashboardStats?.attendance_rate || 0;
+  const telegramLinked = dashboardStats?.telegram_linked || 0;
+  const telegramMessages = dashboardStats?.telegram_messages || 0;
 
   // Top 3 from leaderboard
   const topMentees = leaderboard?.slice(0, 3) || [];
@@ -84,7 +91,7 @@ export default function AdminDashboardPage() {
     }
   };
 
-  if (loadingSessions || loadingMentees || loadingLeaderboard) {
+  if (loadingSessions || loadingMentees || loadingLeaderboard || loadingStats) {
     return <FullPageSpinner />;
   }
 
@@ -93,7 +100,7 @@ export default function AdminDashboardPage() {
       <h1 className="text-2xl text-[#1B4F72] mb-6">Dashboard</h1>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         <Link
           to="/admin/mentees"
           className="bg-white rounded-lg shadow-md border border-gray-200 p-6 hover:shadow-lg transition-shadow"
@@ -124,6 +131,47 @@ export default function AdminDashboardPage() {
           </div>
         </Link>
 
+        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-500">Attendance Rate</p>
+              <p className="text-3xl font-bold text-[#1B4F72]">{attendanceRate}%</p>
+            </div>
+            <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center">
+              <BarChart3 className="w-6 h-6 text-emerald-600" />
+            </div>
+          </div>
+        </div>
+
+        <Link
+          to="/admin/telegram"
+          className="bg-white rounded-lg shadow-md border border-gray-200 p-6 hover:shadow-lg transition-shadow"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-500">Telegram Linked</p>
+              <p className="text-3xl font-bold text-[#1B4F72]">
+                {telegramLinked}<span className="text-lg text-gray-400">/{totalMentees}</span>
+              </p>
+            </div>
+            <div className="w-12 h-12 rounded-full bg-sky-100 flex items-center justify-center">
+              <Send className="w-6 h-6 text-sky-600" />
+            </div>
+          </div>
+        </Link>
+
+        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-500">Telegram Messages</p>
+              <p className="text-3xl font-bold text-[#1B4F72]">{telegramMessages.toLocaleString()}</p>
+            </div>
+            <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
+              <MessageSquare className="w-6 h-6 text-purple-600" />
+            </div>
+          </div>
+        </div>
+
         <Link
           to="/admin/leaderboard"
           className="bg-white rounded-lg shadow-md border border-gray-200 p-6 hover:shadow-lg transition-shadow"
@@ -135,21 +183,6 @@ export default function AdminDashboardPage() {
             </div>
             <div className="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center">
               <Trophy className="w-6 h-6 text-yellow-600" />
-            </div>
-          </div>
-        </Link>
-
-        <Link
-          to="/admin/telegram"
-          className="bg-white rounded-lg shadow-md border border-gray-200 p-6 hover:shadow-lg transition-shadow"
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-500">Unmapped Users</p>
-              <p className="text-3xl font-bold text-[#1B4F72]">{unmappedCount}</p>
-            </div>
-            <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
-              <MessageSquare className="w-6 h-6 text-purple-600" />
             </div>
           </div>
         </Link>

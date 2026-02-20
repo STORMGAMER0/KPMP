@@ -23,6 +23,7 @@ export interface UserInfo {
 export interface ChangePasswordRequest {
   current_password: string;
   new_password: string;
+  telegram_username?: string;
 }
 
 export const authApi = {
@@ -39,10 +40,15 @@ export const authApi = {
     return response.data;
   },
 
-  changePassword: async (currentPassword: string, newPassword: string): Promise<void> => {
+  changePassword: async (
+    currentPassword: string,
+    newPassword: string,
+    telegramUsername?: string
+  ): Promise<void> => {
     await apiClient.post('/auth/change-password', {
       current_password: currentPassword,
       new_password: newPassword,
+      telegram_username: telegramUsername || undefined,
     });
   },
 };
