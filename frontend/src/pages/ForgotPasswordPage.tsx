@@ -63,21 +63,11 @@ export default function ForgotPasswordPage() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-8">
         <div className="text-center mb-6">
-          <div className="inline-block p-3 rounded-full mb-4 bg-[#1B4F72]">
-            <svg
-              className="w-8 h-8 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
-              />
-            </svg>
-          </div>
+          <img
+            src="/kpdf-logo.jpeg"
+            alt="KPDF Logo"
+            className="w-20 h-20 rounded-full object-cover mx-auto mb-4 shadow-lg"
+          />
           <h2 className="text-2xl text-[#1B4F72]">Forgot Password</h2>
           <p className="text-sm text-gray-600 mt-2">
             Enter your email or Mentee ID and we'll send you a link to reset your password.
