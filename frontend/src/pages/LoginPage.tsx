@@ -68,28 +68,28 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center px-4">
+    <div className="h-screen bg-white flex items-center justify-center px-4 overflow-hidden">
       <div className="w-full max-w-md">
         {/* KPDF Logo/Name */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
           <img
             src="/kpdf-logo.jpeg"
             alt="KPDF Logo"
-            className="w-24 h-24 rounded-full object-cover mx-auto mb-4 shadow-lg"
+            className="w-20 h-20 rounded-full object-cover mx-auto mb-3 shadow-lg"
           />
-          <h1 className="text-3xl mb-2 text-[#1B4F72]">
+          <h1 className="text-2xl sm:text-3xl mb-1 text-[#1B4F72]">
             Kings Patriots Development Foundation
           </h1>
-          <p className="text-gray-600">Mentee Portal</p>
+          <p className="text-gray-600 text-sm">Mentee Portal</p>
         </div>
 
         {/* Login Form */}
-        <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-8">
-          <h2 className="text-2xl mb-6 text-center text-[#1B4F72]">
+        <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-6 sm:p-8">
+          <h2 className="text-xl mb-4 text-center text-[#1B4F72]">
             Sign In
           </h2>
 
-          <form onSubmit={handleLogin} className="space-y-5">
+          <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <label htmlFor="identifier" className="block mb-2 text-gray-700">
                 Mentee ID / Email
@@ -152,7 +152,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <p className="text-center text-sm text-gray-500 mt-6">
+          <p className="text-center text-sm text-gray-500 mt-4">
             Don't have an account? Contact your administrator.
           </p>
         </div>

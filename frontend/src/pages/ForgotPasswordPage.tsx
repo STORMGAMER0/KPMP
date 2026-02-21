@@ -27,8 +27,8 @@ export default function ForgotPasswordPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-        <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-8 text-center">
+      <div className="h-screen bg-gray-50 flex items-center justify-center px-4 overflow-hidden">
+        <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 sm:p-8 text-center">
           <div className="inline-block p-3 rounded-full mb-4 bg-green-100">
             <svg
               className="w-8 h-8 text-green-600"
@@ -60,13 +60,13 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-8">
-        <div className="text-center mb-6">
+    <div className="h-screen bg-gray-50 flex items-center justify-center px-4 overflow-hidden">
+      <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 sm:p-8">
+        <div className="text-center mb-4">
           <img
             src="/kpdf-logo.jpeg"
             alt="KPDF Logo"
-            className="w-20 h-20 rounded-full object-cover mx-auto mb-4 shadow-lg"
+            className="w-16 h-16 rounded-full object-cover mx-auto mb-3 shadow-lg"
           />
           <h2 className="text-2xl text-[#1B4F72]">Forgot Password</h2>
           <p className="text-sm text-gray-600 mt-2">
